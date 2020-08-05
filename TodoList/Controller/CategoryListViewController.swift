@@ -7,19 +7,23 @@
 
 import UIKit
 import CoreData
+import ChameleonFramework
 
 
-class CategoryListViewController: UITableViewController {
+
+class CategoryListViewController: SwipeTableViewController {
     
-   var categories = [Category]()
-    
+    var categories = [Category]()
+       
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         loadCategories()
-
+        
+        tableView.rowHeight = 100.0
+        
     }
     
     //MARK: - TableView Datasource Methods
@@ -30,26 +34,32 @@ class CategoryListViewController: UITableViewController {
         
     }
     
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        cell.textLabel?.text = categories[indexPath.row].name
+        let category = categories[indexPath.row]
+        
+        cell.textLabel?.text = category.name ?? "No Categories Added Yet"
+        
+        cell.backgroundColor = UIColor(hexString: category.colour ?? "1D9BF6")
+        cell.textLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
         
         return cell
-        
     }
-
+    
+    
     
     //MARK: - TableView Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self)
     }
-
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as! TodoListViewController
-
+        
         if let indexPath = tableView.indexPathForSelectedRow {
             destinationVC.selectedCategory = categories[indexPath.row]
         }
@@ -77,7 +87,7 @@ class CategoryListViewController: UITableViewController {
         } catch {
             print("Error loading categories \(error)")
         }
-       
+        
         tableView.reloadData()
         
     }
@@ -94,7 +104,7 @@ class CategoryListViewController: UITableViewController {
             
             let newCategory = Category(context: self.context)
             newCategory.name = textField.text!
-            
+            newCategory.colour = UIColor.randomFlat().hexValue()
             self.categories.append(newCategory)
             
             self.saveCategories()
@@ -110,6 +120,13 @@ class CategoryListViewController: UITableViewController {
         
         present(alert, animated: true, completion: nil)
         
+    }
+    
+    //MARK: -Delete Data From Swipe
+    override func updateModel(at indexPath: IndexPath) {
+        super.updateModel(at: indexPath)
+        context.delete(categories[indexPath.row])
+        categories.remove(at: indexPath.row)
     }
     
     

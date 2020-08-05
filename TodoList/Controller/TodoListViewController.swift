@@ -2,8 +2,9 @@
 
 import UIKit
 import CoreData
+import ChameleonFramework
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     
     
     var itemArray = [Item]()
@@ -24,7 +25,9 @@ class TodoListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-       
+        
+        tableView.rowHeight = 100.0
+        tableView.separatorStyle = .none
         loadItems()
         
     }
@@ -32,12 +35,17 @@ class TodoListViewController: UITableViewController {
     
     //MARK - Table View Data Source Methods
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         let item = itemArray[indexPath.row]
         
         cell.textLabel?.text = item.title
         
+        cell.backgroundColor = UIColor(hexString: selectedCategory!.colour!)!.darken(byPercentage:
+            CGFloat(indexPath.row) / CGFloat(itemArray.count)
+        )
+        cell.textLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
+               
         cell.accessoryType = item.done == true ? .checkmark : .none
         
         return cell
@@ -130,6 +138,13 @@ class TodoListViewController: UITableViewController {
         }
         
         tableView.reloadData()
+        
+    }
+    
+    override func updateModel(at indexPath: IndexPath) {
+        let item = itemArray[indexPath.row]
+        context.delete(itemArray[indexPath.row])
+        itemArray.remove(at: indexPath.row)
         
     }
     
