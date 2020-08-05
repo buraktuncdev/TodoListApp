@@ -6,7 +6,6 @@ import ChameleonFramework
 
 class TodoListViewController: SwipeTableViewController {
     
-    
     var itemArray = [Item]()
     
     var selectedCategory : Category? {
@@ -14,6 +13,7 @@ class TodoListViewController: SwipeTableViewController {
             loadItems()
         }
     }
+    @IBOutlet weak var searchBar: UISearchBar!
     
     let defaults = UserDefaults.standard
     
@@ -30,6 +30,25 @@ class TodoListViewController: SwipeTableViewController {
         tableView.separatorStyle = .none
         loadItems()
         
+        
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if let colourHex = selectedCategory?.colour {
+            
+            title = selectedCategory?.name
+            
+            guard let navBar = navigationController?.navigationBar else { fatalError("Navigation Controller Does Not Exist.")}
+            
+            navBar.backgroundColor = UIColor(hexString: colourHex)
+            
+            navBar.tintColor = ContrastColorOf(UIColor(hexString: colourHex)!, returnFlat: true)
+            
+            navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(UIColor(hexString: colourHex)!, returnFlat: true)]
+            
+            searchBar.barTintColor = UIColor(hexString: colourHex)
+        }
     }
     
     
@@ -45,7 +64,7 @@ class TodoListViewController: SwipeTableViewController {
             CGFloat(indexPath.row) / CGFloat(itemArray.count)
         )
         cell.textLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
-               
+        
         cell.accessoryType = item.done == true ? .checkmark : .none
         
         return cell
@@ -128,7 +147,7 @@ class TodoListViewController: SwipeTableViewController {
         } else {
             request.predicate = categoryPredicate
         }
-
+        
         
         
         do {
@@ -143,7 +162,7 @@ class TodoListViewController: SwipeTableViewController {
     
     override func updateModel(at indexPath: IndexPath) {
         let item = itemArray[indexPath.row]
-        context.delete(itemArray[indexPath.row])
+        context.delete(item)
         itemArray.remove(at: indexPath.row)
         
     }
@@ -164,7 +183,7 @@ extension TodoListViewController: UISearchBarDelegate {
         
         
         loadItems(request: request, predicate: predicate)
-    
+        
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

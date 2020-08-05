@@ -10,7 +10,6 @@ import CoreData
 import ChameleonFramework
 
 
-
 class CategoryListViewController: SwipeTableViewController {
     
     var categories = [Category]()
@@ -21,7 +20,8 @@ class CategoryListViewController: SwipeTableViewController {
         super.viewDidLoad()
         
         loadCategories()
-        
+        navigationController?.navigationBar.backgroundColor = .black
+                  
         tableView.rowHeight = 100.0
         
     }

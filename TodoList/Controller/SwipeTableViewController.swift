@@ -10,16 +10,12 @@ import SwipeCellKit
 
 class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegate {
     
-
-  
     override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
     
     // Table View Data Source Methods
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! SwipeTableViewCell
         cell.delegate = self
         return cell
